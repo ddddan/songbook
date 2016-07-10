@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  #body
+    form(name='songtext', action='/song-submit', method='post')
+      textarea#songtext(name="songtext", placeholder='Copy your song text here.')
+      br
+      input#submit(type='submit', value='Submit', disabled)
+  script(type='text/javascript' src='js/songEdit.js')

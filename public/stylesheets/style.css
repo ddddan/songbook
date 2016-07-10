@@ -1,8 +1,38 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    font: 14px "Segoe UI", Helvetica, Arial, sans-serif;
+    background-image: url(/img/background.png);
+}
+a {
+    color: #00B7FF;
 }
 
-a {
-  color: #00B7FF;
+/* HEADER */
+
+#header {
+    background-color: #cfe;
+    border-bottom: 1px solid #666;
 }
+#header h1 {
+    margin: 0;
+    padding: 0.3em;
+    font-family: 'Calibri Light', 'Helvetica Neue', Arial, sans-serif;
+}
+#body {
+    margin: 1em;
+}
+textarea#songtext {
+    height: 500px;
+    width: 50%;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border: 1px solid #666;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
+}
+button#submitSongtext {
+    width: 5em;
+    height: 2em;
+}
+
