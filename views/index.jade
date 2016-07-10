@@ -3,4 +3,18 @@ extends layout
 block content
   #body
     p Welcome to #{title}
+    #songbooks.list
+      .listHeader
+        h2 Songbooks
+      .listMain
+        p Loading Songbooks...
+      .listFooter
+        input#addSongbook.hidden(type='button', value='+')
+    #songs.list
+      .listHeader
+        h2 Songs
+      .listMain
+        p Loading Songs...
+      .listFooter
+        input#addSong.hidden(type='button', value='+')
   #footer

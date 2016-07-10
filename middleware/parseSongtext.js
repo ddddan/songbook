@@ -12,6 +12,7 @@
 /* Packages */
 var fs = require('fs'),
     util = require('util'),
+    MongoClient = require('mongodb').MongoClient,
     test = require('assert');
 
 /**
@@ -27,6 +28,7 @@ var parseSongtext = function (req, res, next) {
     // C.dev = true; // Change for deployment
     // C.debug = true; // Change for deployment
     // C.fileName = '..\\tmp\\07 - Not By Might.txt';
+    C.mongoURL = 'mongodb://localhost:27017/songbook';
     C.secTypes = {
         verse: 1,
         estrofa: 1,
@@ -63,9 +65,11 @@ var parseSongtext = function (req, res, next) {
     /**
      * Parse the songtext into an object that can be stringified later
      *
+     * @param {object} db - The mongodb object
      * @param {string} songText - The raw songtext
+     * @param {object} opts - Options
      */
-    function parseSongtext(songText) {
+    function parseSongtext(db, songText, opts) {
 
         var rows = songText.split('\n'),
             currSection = new Section(),
@@ -88,6 +92,7 @@ var parseSongtext = function (req, res, next) {
             var sectionName = firstWord.toLowerCase();
             if (sectionName === '©' || sectionName === '(C)') {
                 // Copyright notice
+                // TODO: Close section here as well
                 result.info.copyright = row;
 
             } else if (C.secTypes.hasOwnProperty(sectionName)) {
@@ -118,13 +123,14 @@ var parseSongtext = function (req, res, next) {
                 currSection.lines.push(row);
 
             } else if (!result.info.hasOwnProperty('title') || !result.info.title) {
-                result.info.title = row;
+                // Title: remove any numbering at the beginning of the title
+                result.info.title = row.replace(/^\d+\.?\s+/, '');
             } else if (!result.info.hasOwnProperty('author') || !result.info.author) {
                 result.info.author = row;
             }
         }
 
-        res.json(result);
+        storeSong(db, result, opts);
 
 
         console.log(util.inspect(result, {
@@ -136,6 +142,37 @@ var parseSongtext = function (req, res, next) {
     }
 
     /**
+     * storeSong - After parsing the songtext, store it in the DB
+     *
+     * @param {object} db - The mongodb object
+     * @param {object} song - Object created by parseSongtext()
+     * @param {object} opts - Options
+     */
+    function storeSong(db, song, opts) {
+        // Ensure the song is not already in the db
+        var songCol = db.collection('songs');
+        songCol.find({
+            title: song.info.title
+        }).toArray(function (err, docs) {
+            // If it is, and the overwrite flag has not been set, return an error
+            if ((err !== null || docs.length > 0) && (!opts.hasOwnProperty('overwrite') || !opts.overwrite)) {
+                res.json({
+                    status: 'error',
+                    error: 'Song Exists'
+                });
+            } else {
+                songCol.insertOne(song, function (err, r) {
+                    test.equal(null, err);
+                    test.equal(1, r.insertedCount);
+                    res.json({
+                        status: 'ok'
+                    });
+                });
+            }
+        });
+    }
+
+    /**
      * DEV: Load songtext from a file
      *
      * @param {string} fileName - The file to load
@@ -143,8 +180,10 @@ var parseSongtext = function (req, res, next) {
     function loadSongtext(fileName) {
         fs.readFile(fileName, 'utf8', function (err, data) {
             test.equal(null, err);
-
-            parseSongtext(data);
+            MongoClient.connect(C.MongoURL, function (err, db) {
+                test.equal(null, err);
+                parseSongtext(db, data, {});
+            });
         });
     }
 
@@ -152,13 +191,22 @@ var parseSongtext = function (req, res, next) {
     if (!!C.dev || !!C.debug) {
         loadSongtext(C.fileName);
     } else {
-        console.log(util.inspect(req.body, {
-            colors: true,
-            showHidden: false,
-            depth: null
-        }));
         if (req.body.hasOwnProperty('songtext')) {
-            parseSongtext(req.body.songtext); // for integration into app
+            console.log(util.inspect(req.query, {
+                colors: true,
+                showHidden: false,
+                depth: null
+            }));
+            var opts = req.query;
+
+            MongoClient.connect(C.mongoURL, function (err, db) {
+                test.equal(null, err);
+                parseSongtext(db, req.body.songtext, opts);
+            });
+
+
+
+
         } else {
             res.send('Nothing received.');
         }

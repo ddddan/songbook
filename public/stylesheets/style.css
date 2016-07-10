@@ -7,6 +7,9 @@ body {
 a {
     color: #00B7FF;
 }
+.hidden {
+    display: none;
+}
 
 /* HEADER */
 
@@ -22,6 +25,41 @@ a {
 #body {
     margin: 1em;
 }
+
+/* MAIN PAGE */
+
+.list {
+    display: inline-block;
+    height: 500px;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border: 1px solid #666;
+    margin-right: 2em;
+}
+
+.listHeader {
+    border-bottom: 1px solid #999;
+}
+
+.list h2 {
+    margin: 0;
+    padding: 0.5em;
+}
+
+.list p {
+    margin-left: 0.5em;
+}
+
+#songbooks {
+    width: 30em;
+}
+
+#songs {
+    width: 30em;
+}
+
+/* SONG EDITOR */
 textarea#songtext {
     height: 500px;
     width: 50%;
@@ -35,4 +73,3 @@ button#submitSongtext {
     width: 5em;
     height: 2em;
 }
-
