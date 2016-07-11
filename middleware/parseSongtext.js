@@ -152,20 +152,27 @@ var parseSongtext = function (req, res, next) {
         // Ensure the song is not already in the db
         var songCol = db.collection('songs');
         songCol.find({
-            title: song.info.title
+            'info.title': song.info.title
         }).toArray(function (err, docs) {
-            // If it is, and the overwrite flag has not been set, return an error
-            if ((err !== null || docs.length > 0) && (!opts.hasOwnProperty('overwrite') || !opts.overwrite)) {
-                res.json({
+            // If it is, and the force flag has not been set, return an error
+            if ((err !== null || docs.length > 0) &&
+                (!opts.hasOwnProperty('force') ||
+                    opts.force !== 'add')) {
+                // TODO: Add 'Replace' option - may need own logic if multiple matches
+                next({
                     status: 'error',
-                    error: 'Song Exists'
+                    error: 'Song Exists',
+                    existing: docs,
+                    originalText: req.body.songtext,
+                    new: song
                 });
             } else {
                 songCol.insertOne(song, function (err, r) {
                     test.equal(null, err);
                     test.equal(1, r.insertedCount);
-                    res.json({
-                        status: 'ok'
+                    next({
+                        status: 'ok',
+                        new: song
                     });
                 });
             }
@@ -204,11 +211,11 @@ var parseSongtext = function (req, res, next) {
                 parseSongtext(db, req.body.songtext, opts);
             });
 
-
-
-
         } else {
-            res.send('Nothing received.');
+            next({
+                    status: 'error',
+                    error: 'Nothing received'
+                });
         }
     }
 }

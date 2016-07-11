@@ -23,5 +23,5 @@ window.onload = function () {
     // Event listeners
     eSongText.addEventListener('input', updateSubmitStatus);
     eSongText.addEventListener('propertychange', updateSubmitStatus);
-    eSubmit.addEventListener('click', submit);
+    // eSubmit.addEventListener('click', submit);
 };

@@ -6,4 +6,9 @@ block content
       textarea#songtext(name="songtext", placeholder='Copy your song text here.')
       br
       input#submit(type='submit', value='Submit', disabled)
-  script(type='text/javascript' src='js/songEdit.js')
+  script(type='text/javascript' src='/js/songEdit.js')
+  script.
+    if (!{songExists}) {
+      window.alert('Sorry, a song with that name already exists.');
+    }
+
