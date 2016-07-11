@@ -35,6 +35,7 @@ function getAllSongs(req, res, next) {
             ]);
         cursor.toArray(function (err, docs) {
             test.equal(null, err);
+            db.close();
             next(docs);
         });
     }

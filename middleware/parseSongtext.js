@@ -159,6 +159,7 @@ var parseSongtext = function (req, res, next) {
                 (!opts.hasOwnProperty('force') ||
                     opts.force !== 'add')) {
                 // TODO: Add 'Replace' option - may need own logic if multiple matches
+                db.close();
                 next({
                     status: 'error',
                     error: 'Song Exists',
@@ -170,6 +171,7 @@ var parseSongtext = function (req, res, next) {
                 songCol.insertOne(song, function (err, r) {
                     test.equal(null, err);
                     test.equal(1, r.insertedCount);
+                    db.close();
                     next({
                         status: 'ok',
                         new: song

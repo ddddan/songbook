@@ -4,27 +4,33 @@ body {
     font: 14px "Segoe UI", Helvetica, Arial, sans-serif;
     background-image: url(/img/background.png);
 }
+
 a {
     color: #00B7FF;
 }
+
 .hidden {
     display: none;
 }
 
+
 /* HEADER */
 
 #header {
-    background-color: #cfe;
+    background-color: #9cf;
     border-bottom: 1px solid #666;
 }
+
 #header h1 {
     margin: 0;
     padding: 0.3em;
     font-family: 'Calibri Light', 'Helvetica Neue', Arial, sans-serif;
 }
+
 #body {
     margin: 1em;
 }
+
 
 /* MAIN PAGE */
 
@@ -61,17 +67,39 @@ a {
     margin: 0;
     padding: 0.3em;
     list-style: none;
+    border-top: 1px none;
     border-bottom: 1px solid #ccc;
 }
 
-
 .list li:hover {
-    background-color: #eff;
+    background-color: #f0f7ff;
+    border: 1px solid #009;
     cursor: pointer;
 }
 
+.list span:hover {
+    color: #009;
+}
+
 .list li:active {
-    padding: 0.4em 0.2em 0.2em 0.4em;
+    background-color: #009;
+    color: #f0f7ff;
+}
+
+.list span:active {
+    padding: 0 0.2em;
+    color: inherit;
+    background-color: inherit;
+
+}
+
+.list input,
+.list span {
+    margin-right: 0.2em;
+}
+
+.list input.add {
+    margin: 0.2em;
 }
 
 #songbooks {
@@ -82,7 +110,9 @@ a {
     width: 30em;
 }
 
+
 /* SONG EDITOR */
+
 textarea#songtext {
     height: 500px;
     width: 50%;
@@ -92,6 +122,7 @@ textarea#songtext {
     border: 1px solid #666;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
 }
+
 button#submitSongtext {
     width: 5em;
     height: 2em;
