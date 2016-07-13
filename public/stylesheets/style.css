@@ -29,6 +29,7 @@ a {
 
 #body {
     margin: 1em;
+    height: 600px;
 }
 
 
@@ -36,7 +37,8 @@ a {
 
 .list {
     display: inline-block;
-    height: 500px;
+    position: relative;
+    height: 600px;
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -47,6 +49,17 @@ a {
 
 .listHeader {
     border-bottom: 1px solid #999;
+    height: 52px;
+}
+
+.listHeader input {
+    position: absolute;
+    right: 0;
+}
+
+.listMain {
+    height: 550px;
+    overflow: auto;
 }
 
 .list h2 {
@@ -61,6 +74,7 @@ a {
 .list ul {
     margin: 0;
     padding: 0;
+    overflow: auto;
 }
 
 .list li {
