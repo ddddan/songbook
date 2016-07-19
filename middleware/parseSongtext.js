@@ -42,13 +42,14 @@ var parseSongtext = function (req, res, next) {
         interlude: 1,
         vamp: 1
     };
+    C.numKeyDigits = 4;
 
     /**
      * Section constructor
      *
-     * @param {string} type - Section type (see above)
-     * @param {int} number - Number of the section
-     * @param {string[]} lines - Content of the section
+     * @param {string}   type   - Section type (see above)
+     * @param {int}      number - Number of the section
+     * @param {string[]} lines  - Content of the section
      */
     var Section = function (type, number, lines) {
         this.type = !!type ? type : '';
@@ -61,6 +62,47 @@ var parseSongtext = function (req, res, next) {
         this.number = 0;
         this.lines = [];
     };
+
+    /**
+     * Get the character representing /val/ in [0-9A-Za-z_-]
+     * @param {number} val - The number to convert
+     */
+    function valChar(val) {
+        if (val < 10) {
+            return String.fromCharCode(val + 48);
+        } else if (val < 36) {
+            return String.fromCharCode(val + 54);
+        } else if (val < 62) {
+            return String.fromCharCode(val + 60);
+        } else {
+            return '_-'.charAt(val - 62);
+        }
+    }
+
+
+    /**
+     * genKey() - Helper function to generate a unique ID for the song
+     */
+    function genKey() {
+        var val,
+            checkSum = 0,
+            result = '';
+        // Generate 4 random numbers between 0 and 63
+        // Convert them to [0-9A-Za-z_-]
+        // Insert checksum in the middle
+        for (var i = 0; i < C.numKeyDigits; i++) {
+            // Disallow [_-] (62, 63) for first digit
+            do {
+                val = Math.floor(Math.random() * 64);
+            } while (!i && val > 62);
+            checkSum += val;
+            result += valChar(val);
+        }
+        checkSum = checkSum % 11;
+        return result.slice(0, 2) + valChar(checkSum) + result.slice(2, 4);
+
+    }
+
 
     /**
      * Parse the songtext into an object that can be stringified later
@@ -132,13 +174,33 @@ var parseSongtext = function (req, res, next) {
 
         storeSong(db, result, opts);
 
-
         console.log(util.inspect(result, {
             colors: true,
             showHidden: false,
             depth: null
         }));
 
+    }
+
+    /**
+     * insertSong(col, song) - Attempt to store the song; separated out to allow "iteration"
+     *                         in case of a hash collision.
+     * @param {object}   col      - The MongoDB object
+     * @param {object}   song     - The song object
+     * @param {function} callback - If successful, do this callback
+     */
+    function insertSong(col, song, callback) {
+        song._id = genKey();
+        col.insertOne(song, function (err, r) {
+            if (err !== null && err.hasOwnProperty('code') && err.code === '11000') {
+                // Duplicate key
+                insertSong(col, song, callback);
+            } else {
+                test.equal(null, err);
+                test.equal(1, r.insertedCount);
+                callback(key);
+            }
+        });
     }
 
     /**
@@ -168,15 +230,15 @@ var parseSongtext = function (req, res, next) {
                     new: song
                 });
             } else {
-                songCol.insertOne(song, function (err, r) {
-                    test.equal(null, err);
-                    test.equal(1, r.insertedCount);
+                insertSong(songCol, song, function (key) {
                     db.close();
+
                     next({
                         status: 'ok',
-                        new: song
+                        new: song,
+                        key: key
                     });
-                });
+                })
             }
         });
     }
@@ -198,7 +260,10 @@ var parseSongtext = function (req, res, next) {
 
     // Main entry point
     if (!!C.dev || !!C.debug) {
-        loadSongtext(C.fileName);
+        // loadSongtext(C.fileName);
+        var key = genKey();
+        process.exit();
+
     } else {
         if (req.body.hasOwnProperty('songtext')) {
             console.log(util.inspect(req.query, {
@@ -215,11 +280,15 @@ var parseSongtext = function (req, res, next) {
 
         } else {
             next({
-                    status: 'error',
-                    error: 'Nothing received'
-                });
+                status: 'error',
+                error: 'Nothing received'
+            });
         }
     }
 }
 
 module.exports = parseSongtext;
+
+if (require.main === module) {
+    parseSongtext(null, null, null);
+}

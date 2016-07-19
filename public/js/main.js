@@ -1,3 +1,57 @@
+function delSong(evt) {
+    var e = evt.target;
+    if (!!e) {
+        var id = e.getAttribute('data-id'),
+            title = e.getAttribute('data-title');
+        if (!!id && !!title) {
+            if (confirm('Are you sure you want to delete "' + title + '"?')) {
+                window.location.href = '/song-del/' + id + '?confirm=1';
+            }
+        }
+    }
+
+}
+
+function editSong(evt) {
+    var e = evt.target;
+    if (!!e) {
+        var id = e.getAttribute('data-id');
+        if (!!id) {
+            window.location.href = '/song-edit/' + id;
+        }
+    }
+}
+
+function viewSong(evt) {
+    var e = evt.target;
+    if (!!e) {
+        var id = e.getAttribute('data-id');
+        if (!!id) {
+            window.location.href = '/song-view/' + id;
+        }
+    }
+}
+
+
+function createButton(name, handlerFunction, attr) {
+    var e = document.createElement('input');
+    e.setAttribute('type', 'button');
+    e.classList.add('btn' + name);
+    e.setAttribute('value', name);
+    if (!!attr) {
+        for (k in attr) {
+            if (attr.hasOwnProperty(k)) {
+                e.setAttribute('data-' + k, attr[k]);
+            }
+        }
+    }
+    if (!!handlerFunction) {
+        e.addEventListener('click', handlerFunction);
+    }
+    return e;
+}
+
+
 function updateSonglist(songs) {
     var eMain = document.getElementById('songsMain');
     // Clear out any existing content
@@ -19,25 +73,30 @@ function updateSonglist(songs) {
         for (var i = 0; i < songs.length; i++) {
             var eLi = document.createElement('li');
 
-            var eDel = document.createElement('input');
-            eDel.setAttribute('type', 'button');
-            eDel.classList.add('btnDel');
-            eDel.setAttribute('value', 'Del');
-            // eDel.addEventListener('click', delSong);
-            eLi.appendChild(eDel);
+            var attr = {};
 
-            var eEdit = document.createElement('input');
-            eEdit.setAttribute('type', 'button');
-            eEdit.classList.add('btnEdit');
-            eEdit.setAttribute('value', 'Edit');
-            eLi.appendChild(eEdit);
+            if (songs[i].hasOwnProperty('title')) {
+                attr.title = songs[i].title;
+            }
+            if (songs[i].hasOwnProperty('_id')) {
+                attr.id = songs[i]._id;
+            }
+
+            var elems = {
+                Del: delSong,
+                Edit: editSong,
+                View: viewSong,
+            };
+            for (var k in elems) {
+                if (elems.hasOwnProperty(k)) {
+                    var e = createButton(k, elems[k], attr);
+                    eLi.appendChild(e);
+                }
+            }
 
             var eName = document.createElement('span');
             if (songs[i].hasOwnProperty('title')) {
-                var title = songs[i].title;
-                eName.innerHTML = title;
-                eDel.setAttribute('data-title', title);
-                eEdit.setAttribute('data-title', title);
+                eName.innerHTML = songs[i].title;
             }
             eLi.appendChild(eName);
 
