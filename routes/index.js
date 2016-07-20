@@ -19,15 +19,53 @@ router.get('/songlist', function (req, res, next) {
     });
 });
 
-/* GET Song editor page */
+/* GET Song editor page (no param) = New Song */
 router.get('/song-edit', function (req, res, next) {
     var songExists = (req.query.hasOwnProperty('error') && req.query.error === 'exists');
     res.render('songEdit', {
         title: 'Songbook Creator - Song Editor',
-        songExists: songExists,
+        songText: null,
+        error: songExists ? 'songExists' : null,
+        update: ''
+    });
+});
+
+/* GET Song editor page (:id) = Existing Song */
+router.get('/song-edit/:id', function (req, res, next) {
+    var getSongText = require('../middleware/getSongText.js');
+    getSongText(req, res, function (data) {
+        var title = 'Songbook Creator - Song Editor';
+
+        if (!data.hasOwnProperty('status') || data.status === 'fail') {
+            if (!data.hasOwnProperty.error) {
+                data.error = 'unknownError';
+            }
+            res.render('songEdit', {
+                title: title,
+                songText: null,
+                error: data.error,
+                update: '',
+            });
+        } else if (data.hasOwnProperty('text')) {
+            res.render('songEdit', {
+                title: title,
+                songText: data.text,
+                error: '',
+                update: 'yes',
+            });
+        } else {
+            res.render('songEdit', {
+                title: title,
+                songText: null,
+                error: 'unknownError',
+                update: ''
+            });
+        }
+
 
     });
 });
+
 
 /* POST Song editor submission */
 router.post('/song-submit', function (req, res, next) {
@@ -52,7 +90,7 @@ router.delete('/song-del/:id', function (req, res, next) {
             if (data.status === 'ok') {
                 res.sendStatus(204);
             } else if (data.hasOwnProperty('error')) {
-                switch(data.error) {
+                switch (data.error) {
                     case 'invalidRequest':
                         res.sendStatus(400);
                         break;

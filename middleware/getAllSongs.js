@@ -10,9 +10,9 @@ var MongoClient = require('mongodb').MongoClient,
 
 /**
  * getAllSongs() - Main entry point
- * @param {object}   req  [[Description]]
- * @param {object}   res  [[Description]]
- * @param {function} next [[Description]]
+ * @param {object}   req  - express request object
+ * @param {object}   res  - express response object
+ * @param {function} next - callback function
  */
 function getAllSongs(req, res, next) {
 

@@ -11,7 +11,6 @@ var MongoClient = require('mongodb').MongoClient,
 
 function deleteSong(req, res, next) {
 
-
     function delSong(db, id) {
         var songCol = db.collection('songs');
         songCol.deleteOne({

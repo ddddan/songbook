@@ -144,3 +144,7 @@ button#submitSongtext {
     width: 5em;
     height: 2em;
 }
+
+input#cancel {
+    margin-left: 2em;
+}
