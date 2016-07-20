@@ -3,9 +3,9 @@ extends layout
 block content
   #body
     form(name='songtext', action='/song-submit', method='post')
-      textarea#songtext(name="songtext", placeholder='Copy your song text here.')= songText
+      textarea#songtext(name='songtext', placeholder='Copy your song text here.')= songText
       br
-      input#update(type='hidden', value='!{update}')
+      input#update(name='update', type='hidden', value=update)
       input#submit(type='submit', value='Submit', disabled)
       input#cancel(type='button', value='Cancel')
   script(type='text/javascript' src='/js/songEdit.js')

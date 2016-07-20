@@ -21,7 +21,7 @@ var fs = require('fs'),
  * @param {object} res - http response (standard)
  * @param {callback function} next - next step in express chain
  */
-var parseSongtext = function (req, res, next) {
+function parseSongtext(req, res, next) {
 
     /* Global constants */
     var C = {};
@@ -70,9 +70,9 @@ var parseSongtext = function (req, res, next) {
         if (val < 10) {
             return String.fromCharCode(val + 48);
         } else if (val < 36) {
-            return String.fromCharCode(val + 54);
+            return String.fromCharCode(val + 55);
         } else if (val < 62) {
-            return String.fromCharCode(val + 60);
+            return String.fromCharCode(val + 61);
         } else {
             return '_-'.charAt(val - 62);
         }
@@ -125,7 +125,10 @@ var parseSongtext = function (req, res, next) {
             // Remove tabs or other weird whitespace characters
             row = row.replace(/\s+/g, ' ');
 
-            var firstWord = row.split(' ')[0];
+            // Find the first space so that the chars before that act as section name
+            var firstSpace = row.indexOf(' ');
+            var firstWord = (firstSpace != -1 ? row.slice(0, firstSpace) : row);
+
             // Blank line:
             if (!firstWord) {
                 continue;
@@ -171,7 +174,11 @@ var parseSongtext = function (req, res, next) {
             }
         }
 
-        storeSong(db, result, opts);
+        if (!opts.update) {
+            storeSong(db, result, opts);
+        } else {
+            updateSong(db, result, opts);
+        }
 
         console.log(util.inspect(result, {
             colors: true,
@@ -243,6 +250,47 @@ var parseSongtext = function (req, res, next) {
     }
 
     /**
+     * updateSong(db, song, opts) - Update an existing song
+     *
+     * @param {object} db - The mongodb object
+     * @param {object} song - Object created by parseSongtext()
+     * @param {object} opts - Options
+     */
+    function updateSong(db, song, opts) {
+        if (!req.params.hasOwnProperty('id') || !req.params.id) {
+            db.close();
+            next({
+                status: 'fail',
+                error: 'invalidRequest'
+            });
+            return;
+        }
+        var id = req.params.id,
+            songCol = db.collection('songs');
+        songCol.replaceOne({
+            _id: id
+        }, song, function (err, r) {
+            db.close();
+            if (!!err) {
+                next({
+                    status: 'fail',
+                    error: 'unknownError'
+                });
+            } else if (!r.modifiedCount) {
+                next({
+                    status: 'fail',
+                    error: 'notFound'
+                });
+            } else { // Success!
+                next({
+                    status: 'ok',
+                    key: _id
+                });
+            }
+        });
+    }
+
+    /**
      * DEV: Load songtext from a file
      *
      * @param {string} fileName - The file to load
@@ -271,6 +319,8 @@ var parseSongtext = function (req, res, next) {
                 depth: null
             }));
             var opts = req.query;
+            // Determine whether this is a create or update
+            opts.update = (req.body.hasOwnProperty('update') && req.body.update === 'yes');
 
             MongoClient.connect(req.app.locals.MongoURL, function (err, db) {
                 test.equal(null, err);
@@ -288,6 +338,6 @@ var parseSongtext = function (req, res, next) {
 
 module.exports = parseSongtext;
 
-if (require.main === module) {
-    parseSongtext(null, null, null);
+if (require.main === module) { // Command line
+    parseSongtext(null, null, function (req, res, next) {});
 }
