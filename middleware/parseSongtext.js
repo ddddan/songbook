@@ -28,7 +28,6 @@ var parseSongtext = function (req, res, next) {
     // C.dev = true; // Change for deployment
     // C.debug = true; // Change for deployment
     // C.fileName = '..\\tmp\\07 - Not By Might.txt';
-    C.mongoURL = 'mongodb://localhost:27017/songbook';
     C.secTypes = {
         verse: 1,
         estrofa: 1,
@@ -251,7 +250,7 @@ var parseSongtext = function (req, res, next) {
     function loadSongtext(fileName) {
         fs.readFile(fileName, 'utf8', function (err, data) {
             test.equal(null, err);
-            MongoClient.connect(C.MongoURL, function (err, db) {
+            MongoClient.connect(req.app.locals.MongoURL, function (err, db) {
                 test.equal(null, err);
                 parseSongtext(db, data, {});
             });
@@ -273,7 +272,7 @@ var parseSongtext = function (req, res, next) {
             }));
             var opts = req.query;
 
-            MongoClient.connect(C.mongoURL, function (err, db) {
+            MongoClient.connect(req.app.locals.MongoURL, function (err, db) {
                 test.equal(null, err);
                 parseSongtext(db, req.body.songtext, opts);
             });

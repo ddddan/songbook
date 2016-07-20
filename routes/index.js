@@ -2,7 +2,6 @@ var express = require('express'),
     util = require('util');
 var router = express.Router();
 
-
 /* GET home page. */
 router.get('/', function (req, res, next) {
     var songAdded = (req.query.hasOwnProperty('songAdded') && req.query.songAdded === 1);
@@ -17,7 +16,7 @@ router.get('/songlist', function (req, res, next) {
     var getAllSongs = require('../middleware/getAllSongs.js');
     getAllSongs(req, res, function (data) {
         res.json(data);
-    })
+    });
 });
 
 /* GET Song editor page */
@@ -41,9 +40,34 @@ router.post('/song-submit', function (req, res, next) {
                 res.redirect('/song-edit/?error=exists');
             }
         }
-
     });
 
+});
+
+/* DELETE delete song */
+router.delete('/song-del/:id', function (req, res, next) {
+    var deleteSong = require('../middleware/deleteSong.js');
+    deleteSong(req, res, function (data) {
+        if (data.hasOwnProperty('status')) {
+            if (data.status === 'ok') {
+                res.sendStatus(204);
+            } else if (data.hasOwnProperty('error')) {
+                switch(data.error) {
+                    case 'invalidRequest':
+                        res.sendStatus(400);
+                        break;
+                    case 'notFound':
+                        res.sendStatus(404);
+                        break;
+                    case 'unknownError':
+                    default:
+                        res.status(500).send('Unknown Error');
+                }
+            } else {
+                res.status(500).send('Unknown Error');
+            }
+        }
+    });
 });
 
 module.exports = router;

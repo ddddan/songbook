@@ -87,18 +87,20 @@ a {
 
 .list li:hover {
     background-color: #f0f7ff;
-    border: 1px solid #009;
-    cursor: pointer;
+    /* border: 1px solid #009; */
+    /* cursor: pointer; */
 }
 
 .list span:hover {
     color: #009;
 }
 
+/*
 .list li:active {
     background-color: #009;
     color: #f0f7ff;
 }
+
 
 .list span:active {
     padding: 0 0.2em;
@@ -106,6 +108,7 @@ a {
     background-color: inherit;
 
 }
+*/
 
 .list input,
 .list span {

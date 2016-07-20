@@ -1,18 +1,43 @@
-function delSong(evt) {
+/**
+ * Delete the song via ajax delete request
+ * @param {string} id    - unique id of the song
+ * @param {string} title - song title
+ */
+function deleteSong(id, title, confirm) {
+    if (!confirm || confirm !== true) {
+        return;
+    }
+    var x = new XMLHttpRequest();
+    x.open('DELETE', '/song-del/' + id + '?confirm=1', true);
+    x.onreadystatechange = function () {
+        if (x.readyState === XMLHttpRequest.DONE) {
+            if (x.status === 204) { // Successful.
+                alert('Delete successful.');
+                getAllSongs(); // Refresh the song list
+            } else if (x.status === 404) { // Unsuccessful
+                alert('Unable to delete "' + title + '".  Please try again later.');
+            }
+        }
+    };
+    x.send();
+}
+
+
+
+function cbDelSong(evt) {
     var e = evt.target;
     if (!!e) {
         var id = e.getAttribute('data-id'),
             title = e.getAttribute('data-title');
         if (!!id && !!title) {
             if (confirm('Are you sure you want to delete "' + title + '"?')) {
-                window.location.href = '/song-del/' + id + '?confirm=1';
+                deleteSong(id, title, true);
             }
         }
     }
-
 }
 
-function editSong(evt) {
+function cbEditSong(evt) {
     var e = evt.target;
     if (!!e) {
         var id = e.getAttribute('data-id');
@@ -22,7 +47,7 @@ function editSong(evt) {
     }
 }
 
-function viewSong(evt) {
+function cbViewSong(evt) {
     var e = evt.target;
     if (!!e) {
         var id = e.getAttribute('data-id');
@@ -83,9 +108,9 @@ function updateSonglist(songs) {
             }
 
             var elems = {
-                Del: delSong,
-                Edit: editSong,
-                View: viewSong,
+                Del: cbDelSong,
+                Edit: cbEditSong,
+                View: cbViewSong,
             };
             for (var k in elems) {
                 if (elems.hasOwnProperty(k)) {
@@ -110,7 +135,7 @@ function updateSonglist(songs) {
     eAdd.classList.remove('hidden');
 }
 
-function ajaxRequest(url, callback) {
+function ajaxGetRequest(url, callback) {
     var x = new XMLHttpRequest();
     x.open('GET', url, true);
     x.onreadystatechange = function () {
@@ -123,11 +148,11 @@ function ajaxRequest(url, callback) {
 }
 
 function getSongbooks() {
-    // ajaxRequest('/songbooks', updateSongbooks);
+    // ajaxGetRequest('/songbooks', updateSongbooks);
 }
 
 function getAllSongs() {
-    ajaxRequest('/songlist', updateSonglist);
+    ajaxGetRequest('/songlist', updateSonglist);
 }
 
 function addSong() {

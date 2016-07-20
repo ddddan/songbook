@@ -6,8 +6,7 @@ var MongoClient = require('mongodb').MongoClient,
     test = require('assert');
 
 /* CONSTANTS */
-var C = {};
-C.MongoURL = 'mongodb://localhost:27017/songbook';
+// var C = {};
 
 /**
  * getAllSongs() - Main entry point
@@ -41,7 +40,7 @@ function getAllSongs(req, res, next) {
     }
 
     /* Main entry point */
-    MongoClient.connect(C.MongoURL, function (err, db) {
+    MongoClient.connect(req.app.locals.MongoURL, function (err, db) {
         test.equal(null, err);
 
         getSongs(db);
