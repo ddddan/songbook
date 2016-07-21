@@ -260,7 +260,7 @@ function parseSongtext(req, res, next) {
                     next({
                         status: 'ok',
                         new: song,
-                        key: key
+                        songId: key
                     });
                 });
             }
@@ -302,7 +302,7 @@ function parseSongtext(req, res, next) {
             } else { // Success!
                 next({
                     status: 'ok',
-                    key: id
+                    songId: id
                 });
             }
         });

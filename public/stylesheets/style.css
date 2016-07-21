@@ -4,15 +4,12 @@ body {
     font: 14px "Segoe UI", Helvetica, Arial, sans-serif;
     background-image: url(/img/background.png);
 }
-
 a {
     color: #00B7FF;
 }
-
 .hidden {
     display: none;
 }
-
 
 /* HEADER */
 
@@ -20,22 +17,18 @@ a {
     background-color: #9cf;
     border-bottom: 1px solid #666;
 }
-
 #header:hover {
     cursor: default;
 }
-
 #header h1 {
     margin: 0;
     padding: 0.3em;
     font-family: 'Calibri Light', 'Helvetica Neue', Arial, sans-serif;
 }
-
 #body {
     margin: 1em;
     height: 600px;
 }
-
 
 /* MAIN PAGE */
 
@@ -50,37 +43,30 @@ a {
     margin-right: 2em;
     vertical-align: top;
 }
-
 .listHeader {
     border-bottom: 1px solid #999;
     height: 52px;
 }
-
 .listHeader input {
     position: absolute;
     right: 0;
 }
-
 .listMain {
     height: 550px;
     overflow: auto;
 }
-
 .list h2 {
     margin: 0;
     padding: 0.5em;
 }
-
 .list p {
     margin-left: 0.5em;
 }
-
 .list ul {
     margin: 0;
     padding: 0;
     overflow: auto;
 }
-
 .list li {
     margin: 0;
     padding: 0.3em;
@@ -88,13 +74,11 @@ a {
     border-top: 1px none;
     border-bottom: 1px solid #ccc;
 }
-
 .list li:hover {
     background-color: #f0f7ff;
     /* border: 1px solid #009; */
     /* cursor: pointer; */
 }
-
 .list span:hover {
     color: #009;
 }
@@ -118,19 +102,15 @@ a {
 .list span {
     margin-right: 0.2em;
 }
-
 .list input.add {
     margin: 0.2em;
 }
-
 #songbooks {
     width: 30em;
 }
-
 #songs {
     width: 30em;
 }
-
 
 /* SONG EDITOR */
 
@@ -142,13 +122,28 @@ textarea#songtext {
     -webkit-border-radius: 4px;
     border: 1px solid #666;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
+    overflow: auto;
+    margin-bottom: 1em;
 }
-
 button#submitSongtext {
     width: 5em;
     height: 2em;
 }
 
-input#cancel {
+/* SONG VIEWER */
+
+#songView {
+    height: 500px;
+    width: 50%;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border: 1px solid #666;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
+    overflow: auto;
+    padding: 1em;
+    margin-bottom: 1em;
+}
+input#home {
     margin-left: 2em;
 }

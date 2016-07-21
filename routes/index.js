@@ -33,8 +33,9 @@ router.get('/song-edit', function (req, res, next) {
 
 /* GET Song editor page (:id) = Existing Song */
 router.get('/song-edit/:id', function (req, res, next) {
-    var getSongText = require('../middleware/getSongText.js');
-    getSongText(req, res, function (data) {
+    var getSong = require('../middleware/getSong.js');
+    req.app.locals.format = 'text';
+    getSong(req, res, function (data) {
         var title = 'Songbook Creator - Song Editor';
 
         if (!data.hasOwnProperty('status') || data.status === 'fail') {
@@ -68,6 +69,46 @@ router.get('/song-edit/:id', function (req, res, next) {
     });
 });
 
+// TODO: Refactor to combine with above
+
+/* GET Song viewer page (:id) = Existing Song */
+router.get('/song-view/:id', function (req, res, next) {
+    var getSong = require('../middleware/getSong.js');
+    req.app.locals.format = 'html';
+    getSong(req, res, function (data) {
+        var title = 'Songbook Creator - Song Viewer';
+
+        if (!data.hasOwnProperty('status') || data.status === 'fail') {
+            if (!data.hasOwnProperty.error) {
+                data.error = 'unknownError';
+            }
+            console.log('/song-view/: ERROR: ' + data.error);
+            res.render('songView', {
+                title: title,
+                songText: null,
+                error: data.error,
+                update: '',
+            });
+        } else if (data.hasOwnProperty('html')) {
+            res.render('songView', {
+                title: title,
+                songHtml: data.html,
+                songId: req.params.id,
+                error: '',
+                update: 'yes',
+            });
+        } else {
+            res.render('songView', {
+                title: title,
+                songText: null,
+                error: 'unknownError',
+                update: ''
+            });
+        }
+
+    });
+});
+
 
 /* POST Song editor submission */
 router.post('/song-submit', function (req, res, next) {
@@ -75,7 +116,11 @@ router.post('/song-submit', function (req, res, next) {
     parseSongtext(req, res, function (data) {
         if (data.hasOwnProperty('status')) {
             if (data.status === 'ok') {
-                res.redirect('/?songAdded=1');
+                if (data.hasOwnProperty('songId')){
+                    res.redirect('/song-view/' + data.songId + '?songAdded=1');
+                } else {
+                    res.redirect('/?songAdded=1');
+                }
             } else if (data.status === 'fail' && data.hasOwnProperty('error') && data.error === 'songExists') {
                 res.redirect('/song-edit/?error=exists');
             }
@@ -91,7 +136,11 @@ router.post('/song-submit/:id', function (req, res, next) {
     parseSongtext(req, res, function (data) {
         if (data.hasOwnProperty('status')) {
             if (data.status === 'ok') {
-                res.redirect('/?songUpdated=1');
+                if (data.hasOwnProperty('songId')){
+                    res.redirect('/song-view/' + data.songId + '?songUpdated=1');
+                } else {
+                    res.redirect('/?songUpdated=1');
+                }
             } else if (data.status === 'fail' && data.hasOwnProperty('error')) {
                 res.redirect('/song-edit/' + id + '?songUpdated=0');
             }

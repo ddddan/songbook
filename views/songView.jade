@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  #body
+    #songView
+      !{songHtml}
+    input#edit(type='button', value='Edit')
+    input#home(type='button', value='Home')
+  script.
+    var songId = '!{songId}';
+  script(type='text/javascript' src='/js/songView.js')
+  script.
+    if ('!{error}') {
+      window.alert('Sorry, the song could not be  at this time. Please try again later.');
+      window.location.href = '/?songViewError=1';
+    }
+
+
