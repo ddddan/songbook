@@ -155,7 +155,7 @@ function getAllSongs() {
     ajaxGetRequest('/songlist', updateSonglist);
 }
 
-function addSong() {
+function cbAddSong() {
     // Redirect to the song editor
     window.location.href = '/song-edit';
 }
@@ -165,6 +165,8 @@ window.onload = function () {
     getSongbooks();
     getAllSongs();
 
-    // Event listeners
-    document.getElementById('addSong').addEventListener('click', addSong);
+    // Default event listeners
+
+    // Add button
+    document.getElementById('addSong').addEventListener('click', cbAddSong);
 };

@@ -52,7 +52,8 @@ function getSongText(req, res, next) {
                 result += '\n';
             }
 
-            result += lyric.type.ucFirst() + ' ' + lyric.number + '\n';
+            // Only add the section number if it is non-zero
+            result += lyric.type.ucFirst() + (!!lyric.number ? ' ' + lyric.number : '') + '\n';
             for (var j = 0; j < lyric.lines.length; j++) {
                 result += lyric.lines[j] + '\n';
             }

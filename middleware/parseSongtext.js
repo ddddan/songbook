@@ -174,6 +174,24 @@ function parseSongtext(req, res, next) {
             }
         }
 
+        // Close off last section
+        if (!!currSection.type) {
+            result.lyrics.push(currSection);
+            if (!sectionCounts.hasOwnProperty(currSection.type)) {
+                sectionCounts[currSection.type] = 1;
+            } else {
+                sectionCounts[currSection.type]++;
+            }
+            currSection = null;
+        }
+
+        // Clean up any singletons - set 'number' to 0
+        for (var i = 0; i < result.lyrics.length; i++) {
+            if (sectionCounts[result.lyrics[i].type] === 1) {
+                result.lyrics[i].number = 0;
+            }
+        }
+
         if (!opts.update) {
             storeSong(db, result, opts);
         } else {
@@ -229,8 +247,8 @@ function parseSongtext(req, res, next) {
                 // TODO: Add 'Replace' option - may need own logic if multiple matches
                 db.close();
                 next({
-                    status: 'error',
-                    error: 'Song Exists',
+                    status: 'fail',
+                    error: 'songExists',
                     existing: docs,
                     originalText: req.body.songtext,
                     new: song
@@ -244,7 +262,7 @@ function parseSongtext(req, res, next) {
                         new: song,
                         key: key
                     });
-                })
+                });
             }
         });
     }
@@ -284,7 +302,7 @@ function parseSongtext(req, res, next) {
             } else { // Success!
                 next({
                     status: 'ok',
-                    key: _id
+                    key: id
                 });
             }
         });
@@ -329,8 +347,8 @@ function parseSongtext(req, res, next) {
 
         } else {
             next({
-                status: 'error',
-                error: 'Nothing received'
+                status: 'fail',
+                error: 'noText'
             });
         }
     }

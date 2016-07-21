@@ -25,6 +25,7 @@ router.get('/song-edit', function (req, res, next) {
     res.render('songEdit', {
         title: 'Songbook Creator - Song Editor',
         songText: null,
+        songId: null,
         error: songExists ? 'songExists' : null,
         update: ''
     });
@@ -50,6 +51,7 @@ router.get('/song-edit/:id', function (req, res, next) {
             res.render('songEdit', {
                 title: title,
                 songText: data.text,
+                songId: req.params.id,
                 error: '',
                 update: 'yes',
             });
@@ -74,13 +76,30 @@ router.post('/song-submit', function (req, res, next) {
         if (data.hasOwnProperty('status')) {
             if (data.status === 'ok') {
                 res.redirect('/?songAdded=1');
-            } else if (data.status === 'error' && data.hasOwnProperty('error') && data.error === 'Song Exists') {
+            } else if (data.status === 'fail' && data.hasOwnProperty('error') && data.error === 'songExists') {
                 res.redirect('/song-edit/?error=exists');
             }
         }
     });
-
 });
+
+router.post('/song-submit/:id', function (req, res, next) {
+    // Force update flag to be set
+    req.body.update = 'yes';
+    var id = req.params.id;
+    var parseSongtext = require('../middleware/parseSongtext.js');
+    parseSongtext(req, res, function (data) {
+        if (data.hasOwnProperty('status')) {
+            if (data.status === 'ok') {
+                res.redirect('/?songUpdated=1');
+            } else if (data.status === 'fail' && data.hasOwnProperty('error')) {
+                res.redirect('/song-edit/' + id + '?songUpdated=0');
+            }
+        }
+    });
+});
+
+
 
 /* DELETE delete song */
 router.delete('/song-del/:id', function (req, res, next) {

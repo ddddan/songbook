@@ -19,6 +19,10 @@ function cbCancel() {
     window.location.href = '/?cancelEdit=1';
 }
 
+function cbHomeScreen() {
+    // Redirect to home
+    window.location.href = '/';
+}
 
 window.onload = function () {
     var eSongText = document.getElementById('songtext'),
@@ -28,9 +32,13 @@ window.onload = function () {
     updateSubmitStatus(); // In case this is pre-populated
 
     // Event listeners
+
     eSongText.addEventListener('input', updateSubmitStatus);
     eSongText.addEventListener('propertychange', updateSubmitStatus);
 
     // eSubmit.addEventListener('click', cbSubmit);
     eCancel.addEventListener('click', cbCancel);
+
+    // Home page:
+    document.getElementById('header').addEventListener('click', cbHomeScreen);
 };
