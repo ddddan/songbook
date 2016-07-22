@@ -222,7 +222,7 @@ function parseSongtext(req, res, next) {
             } else {
                 test.equal(null, err);
                 test.equal(1, r.insertedCount);
-                callback(key);
+                callback(song._id);
             }
         });
     }

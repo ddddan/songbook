@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
+var auth = require('./libs/auth.js');
+
 var app = express();
 
 // view engine setup
@@ -23,7 +25,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // App level variables
-app.locals.MongoURL = 'mongodb://localhost:27017/songbook';
+var URL = auth() || 'mongodb://localhost:27017/songbook';
+app.locals.MongoURL = URL;
 
 app.use('/', routes);
 app.use('/users', users);
