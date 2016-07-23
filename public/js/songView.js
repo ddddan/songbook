@@ -12,9 +12,10 @@ function cbHomeScreen() {
 }
 
 window.onload = function () {
+    /*
     document.getElementById('edit').addEventListener('click', cbEdit);
     document.getElementById('home').addEventListener('click', cbHome);
-
+*/
     // Home page:
     document.getElementById('header').addEventListener('click', cbHomeScreen);
 };

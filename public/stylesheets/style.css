@@ -4,12 +4,15 @@ body {
     font: 14px "Segoe UI", Helvetica, Arial, sans-serif;
     background-image: url(/img/background.png);
 }
+
 a {
     color: #00B7FF;
 }
+
 .hidden {
     display: none;
 }
+
 
 /* HEADER */
 
@@ -17,56 +20,66 @@ a {
     background-color: #9cf;
     border-bottom: 1px solid #666;
 }
+
 #header:hover {
     cursor: default;
 }
+
 #header h1 {
     margin: 0;
     padding: 0.3em;
     font-family: 'Calibri Light', 'Helvetica Neue', Arial, sans-serif;
 }
+
 #body {
     margin: 1em;
     height: 600px;
 }
+
 
 /* MAIN PAGE */
 
 .list {
     display: inline-block;
     position: relative;
-    height: 600px;
+    height: 615px;
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border: 1px solid #666;
-    margin-right: 2em;
     vertical-align: top;
 }
+
 .listHeader {
     border-bottom: 1px solid #999;
     height: 52px;
 }
+
 .listHeader input {
     position: absolute;
     right: 0;
 }
+
 .listMain {
-    height: 550px;
+    height: 560px;
     overflow: auto;
 }
+
 .list h2 {
     margin: 0;
     padding: 0.5em;
 }
+
 .list p {
     margin-left: 0.5em;
 }
+
 .list ul {
     margin: 0;
     padding: 0;
     overflow: auto;
 }
+
 .list li {
     margin: 0;
     padding: 0.3em;
@@ -74,22 +87,28 @@ a {
     border-top: 1px none;
     border-bottom: 1px solid #ccc;
 }
+
 .list li:hover {
     background-color: #f0f7ff;
     /* border: 1px solid #009; */
     /* cursor: pointer; */
 }
+
+.list span {
+    display: inline-block;
+    width: 17em;
+}
+
 .list span:hover {
     color: #009;
 }
 
-/*
-.list li:active {
-    background-color: #009;
-    color: #f0f7ff;
+.list li.selected {
+    background-color: #9cf;
 }
 
 
+/*
 .list span:active {
     padding: 0 0.2em;
     color: inherit;
@@ -102,15 +121,42 @@ a {
 .list span {
     margin-right: 0.2em;
 }
+
 .list input.add {
     margin: 0.2em;
 }
-#songbooks {
+
+#songbook {
     width: 30em;
 }
+
 #songs {
     width: 30em;
 }
+
+#moveArrows {
+    display: inline-block;
+    font-size: 300%;
+    margin: 250px 0.5em;
+}
+
+.arrow {
+    cursor: default;
+    margin: 0 2px 2px 0;
+}
+
+.arrow.disabled {
+    color: #ccc;
+}
+
+.arrow:not(.disabled):active {
+    margin: 2px 0 0 2px;
+}
+
+.arrow.disabled:active {
+    padding: 0;
+}
+
 
 /* SONG EDITOR */
 
@@ -125,10 +171,12 @@ textarea#songtext {
     overflow: auto;
     margin-bottom: 1em;
 }
+
 button#submitSongtext {
     width: 5em;
     height: 2em;
 }
+
 
 /* SONG VIEWER */
 
@@ -144,6 +192,30 @@ button#submitSongtext {
     padding: 1em;
     margin-bottom: 1em;
 }
+
 input#home {
     margin-left: 2em;
+}
+
+h2 {
+    font-family: 'Cambria', 'Times New Roman', 'Times', serif;
+    font-size: 20px;
+    color: #365fc1;
+}
+
+h3 {
+    font-family: Calibri;
+    font-size: 17.5px;
+    color: blue;
+    padding-bottom: 0.3em;
+    margin: 0.5em 0 0.2em;
+    color: #365fc1;
+}
+
+p {
+    font-family: Calibri;
+    font-size: 17.5px;
+    line-height: 135%;
+    padding: 0.3em 0;
+    margin: 0;
 }

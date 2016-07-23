@@ -90,12 +90,17 @@ router.get('/song-view/:id', function (req, res, next) {
                 update: '',
             });
         } else if (data.hasOwnProperty('html')) {
+            var naked = false;
+            if (req.query.hasOwnProperty('naked') && req.query.naked === 1) {
+                naked = true;
+            }
             res.render('songView', {
                 title: title,
                 songHtml: data.html,
                 songId: req.params.id,
                 error: '',
                 update: 'yes',
+                naked: naked
             });
         } else {
             res.render('songView', {
@@ -116,7 +121,7 @@ router.post('/song-submit', function (req, res, next) {
     parseSongtext(req, res, function (data) {
         if (data.hasOwnProperty('status')) {
             if (data.status === 'ok') {
-                if (data.hasOwnProperty('songId')){
+                if (data.hasOwnProperty('songId')) {
                     res.redirect('/song-view/' + data.songId + '?songAdded=1');
                 } else {
                     res.redirect('/?songAdded=1');
@@ -136,7 +141,7 @@ router.post('/song-submit/:id', function (req, res, next) {
     parseSongtext(req, res, function (data) {
         if (data.hasOwnProperty('status')) {
             if (data.status === 'ok') {
-                if (data.hasOwnProperty('songId')){
+                if (data.hasOwnProperty('songId')) {
                     res.redirect('/song-view/' + data.songId + '?songUpdated=1');
                 } else {
                     res.redirect('/?songUpdated=1');
@@ -149,30 +154,48 @@ router.post('/song-submit/:id', function (req, res, next) {
 });
 
 
+/**
+ * handleResponse(res, data) - create a generic handler
+ * @param {object} res  - The usual http response object
+ * @param {object} data - Data returned from middleware
+ */
+function handleResponse(res, data) {
+    if (data.hasOwnProperty('status')) {
+        if (data.status === 'ok') {
+            res.sendStatus(204);
+        } else if (data.hasOwnProperty('error')) {
+            switch (data.error) {
+            case 'invalidRequest':
+                res.sendStatus(400);
+                break;
+            case 'notFound':
+                res.sendStatus(404);
+                break;
+            case 'unknownError':
+            default:
+                res.status(500).send('Unknown Error');
+            }
+        } else {
+            res.status(500).send('Unknown Error');
+        }
+    }
+}
+
 
 /* DELETE delete song */
 router.delete('/song-del/:id', function (req, res, next) {
     var deleteSong = require('../middleware/deleteSong.js');
     deleteSong(req, res, function (data) {
-        if (data.hasOwnProperty('status')) {
-            if (data.status === 'ok') {
-                res.sendStatus(204);
-            } else if (data.hasOwnProperty('error')) {
-                switch (data.error) {
-                    case 'invalidRequest':
-                        res.sendStatus(400);
-                        break;
-                    case 'notFound':
-                        res.sendStatus(404);
-                        break;
-                    case 'unknownError':
-                    default:
-                        res.status(500).send('Unknown Error');
-                }
-            } else {
-                res.status(500).send('Unknown Error');
-            }
-        }
+        handleResponse(res, data);
+    });
+});
+
+
+/* GET add song to Songbook */
+router.get('/songbook-addsong/:id', function (req, res, next) {
+    var addToSongbook = require('../middleware/addToSongbook.js');
+    addToSongbook(req, res, function (data) {
+        handleResponse(res, data);
     });
 });
 

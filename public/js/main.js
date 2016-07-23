@@ -22,40 +22,123 @@ function deleteSong(id, title, confirm) {
     x.send();
 }
 
+/**
+ * Add the song to the current songlist.
+ * @param {string} songId - The unique id of the song
+ */
+function addToSongbook(songList) {
+    var x = new XMLHttpRequest();
+    x.open('GET', '/songbook-addsong/' + songList.join(';'), true);
+    x.onreadystatechange = function () {
+        if (x.readyState === XMLHttpRequest.DONE) {
+            if (x.status === 204) { // Successful.
+                getAllSongs(); // Refresh the song list
+            } else if (x.status === 404) { // Unsuccessful
+                alert('Unable to add "' + title + '" to the songbook.  Please try again later.');
+            }
+        }
+    };
+    x.send();
+}
+
 
 
 function cbDelSong(evt) {
     var e = evt.target;
     if (!!e) {
-        var id = e.getAttribute('data-id'),
-            title = e.getAttribute('data-title');
+        var id = e.parentElement.getAttribute('data-id'),
+            title = e.parentElement.getAttribute('data-title');
         if (!!id && !!title) {
             if (confirm('Are you sure you want to delete "' + title + '"?')) {
                 deleteSong(id, title, true);
             }
         }
+        event.preventDefault();
     }
 }
 
 function cbEditSong(evt) {
     var e = evt.target;
     if (!!e) {
-        var id = e.getAttribute('data-id');
+        var id = e.parentElement.getAttribute('data-id');
         if (!!id) {
             window.location.href = '/song-edit/' + id;
         }
+        event.preventDefault();
     }
 }
 
 function cbViewSong(evt) {
     var e = evt.target;
     if (!!e) {
-        var id = e.getAttribute('data-id');
+        var id = e.parentElement.getAttribute('data-id');
         if (!!id) {
             window.location.href = '/song-view/' + id;
         }
+        event.preventDefault();
+
     }
 }
+
+function updateArrows() {
+    var checkCount = document.getElementsByClassName('song selected').length;
+    var eLeft = document.getElementById('leftArrow');
+    if (!checkCount) {
+        eLeft.className = 'arrow disabled';
+    } else if (checkCount === 1) {
+        eLeft.className = 'arrow';
+    }
+}
+
+function cbToggleSong(evt) {
+    var e = evt.target;
+    var ePar = evt.target.parentElement;
+
+    if (!!e.checked) {
+        ePar.className = 'song selected';
+    } else {
+        ePar.className = 'song';
+    }
+
+    // Make sure arrows have correct state
+    updateArrows();
+
+}
+
+function cbAddToSongbook(evt) {
+    var e = evt.target;
+    // If disabled, stop
+    if (e.className.match(/disabled/)) {
+        return;
+    }
+
+    // Ajax call to move
+    var songList = [];
+    var checkedNodes = document.getElementsByClassName('selected');
+
+    // Maximum moves at a time
+    if (checkedNodes.length > 20) {
+        alert('Sorry, no more than 20 songs may be added at once');
+        return;
+    }
+
+    for (var i = 0; i < checkedNodes.length; i++) {
+        songList.push(checkedNodes[i].getAttribute('data-id'));
+    }
+
+    addToSongbook(songList);
+}
+
+function cbRemoveFromSongbook(evt) {
+    var e = evt.target;
+    // If disabled, stop
+    if (e.className.match(/disabled/)) {
+        return;
+    }
+
+    // Ajax call to move
+}
+
 
 
 function createButton(name, handlerFunction, attr) {
@@ -63,13 +146,6 @@ function createButton(name, handlerFunction, attr) {
     e.setAttribute('type', 'button');
     e.classList.add('btn' + name);
     e.setAttribute('value', name);
-    if (!!attr) {
-        for (k in attr) {
-            if (attr.hasOwnProperty(k)) {
-                e.setAttribute('data-' + k, attr[k]);
-            }
-        }
-    }
     if (!!handlerFunction) {
         e.addEventListener('click', handlerFunction);
     }
@@ -98,15 +174,19 @@ function updateSonglist(songs) {
         for (var i = 0; i < songs.length; i++) {
             var eLi = document.createElement('li');
 
+            eLi.className = 'song';
+
+            // Attributes for buttons
             var attr = {};
 
             if (songs[i].hasOwnProperty('title')) {
-                attr.title = songs[i].title;
+                eLi.setAttribute('data-title', songs[i].title);
             }
             if (songs[i].hasOwnProperty('_id')) {
-                attr.id = songs[i]._id;
+                eLi.setAttribute('data-id', songs[i]._id);
             }
 
+            // Buttons
             var elems = {
                 Del: cbDelSong,
                 Edit: cbEditSong,
@@ -119,11 +199,18 @@ function updateSonglist(songs) {
                 }
             }
 
+            // Song name
             var eName = document.createElement('span');
+            eName.className = 'songName';
             if (songs[i].hasOwnProperty('title')) {
                 eName.innerHTML = songs[i].title;
             }
             eLi.appendChild(eName);
+
+            var eCheck = document.createElement('input');
+            eCheck.setAttribute('type', 'checkbox');
+            eCheck.addEventListener('change', cbToggleSong);
+            eLi.appendChild(eCheck);
 
             eUl.appendChild(eLi);
         }
@@ -133,6 +220,8 @@ function updateSonglist(songs) {
     // Enable add (+) button
     var eAdd = document.getElementById('addSong');
     eAdd.classList.remove('hidden');
+
+    updateArrows();
 }
 
 function ajaxGetRequest(url, callback) {
@@ -140,8 +229,8 @@ function ajaxGetRequest(url, callback) {
     x.open('GET', url, true);
     x.onreadystatechange = function () {
         if (x.readyState === XMLHttpRequest.DONE && x.status === 200) {
-            var songs = JSON.parse(x.responseText);
-            callback(songs);
+            var data = JSON.parse(x.responseText);
+            callback(data);
         }
     };
     x.send();
@@ -169,4 +258,12 @@ window.onload = function () {
 
     // Add button
     document.getElementById('addSong').addEventListener('click', cbAddSong);
+
+
+    // Arrows
+    var eLeft = document.getElementById('leftArrow');
+    eLeft.addEventListener('click', cbAddToSongbook);
+
+    var eRight = document.getElementById('rightArrow');
+    eRight.addEventListener('click', cbRemoveFromSongbook);
 };

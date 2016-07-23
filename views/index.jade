@@ -3,19 +3,23 @@ extends layout
 block content
   #body
     p Welcome to #{title}
-    #songbooks.list
+    #songbook.list
       .listHeader
-        h2 Songbooks
-      #songbooksMain.listMain
-        p Loading Songbooks...
+        h2 Songbook
+      #songbookMain.listMain
+        p Loading songbook...
       .listFooter
-        input#addSongbook.add.hidden(type='button', value='New')
+    #moveArrows
+      #leftArrow.arrow.disabled
+        | &#x21e6;
+      #rightArrow.arrow.disabled
+        | &#x21e8;
     #songs.list
       .listHeader
         input#addSong.add.hidden(type='button', value='New')
         h2 Songs
       #songsMain.listMain
-        p Loading Songs...
+        p Loading available songs...
       .listFooter
 
   #footer
